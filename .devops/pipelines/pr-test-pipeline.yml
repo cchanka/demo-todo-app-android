@@ -4,7 +4,7 @@ pool:
 stages:
   - stage: Test
     jobs:
-      - job: Job-TestingPRBuild
+      - job: Job_Test
         steps:
         - task: Gradle@2
           inputs:
@@ -21,7 +21,7 @@ stages:
 
   - stage: Publish Results
     jobs:
-      - job: Job-PublishingResults
+      - job: Job_PublishResults
         steps:
           - bash: |
               echo Publishing Results...
