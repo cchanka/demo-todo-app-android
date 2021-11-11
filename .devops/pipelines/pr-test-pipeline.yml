@@ -1,0 +1,30 @@
+pool:
+  vmImage: 'macOS-10.14'
+
+trigger: none
+
+stages:
+  - stage: Test
+    jobs:
+      - job: Job_Test
+        steps:
+        - task: Gradle@2
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.8'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: true
+            testResultsFiles: '**/TEST-*.xml'
+            tasks: 'test'
+          displayName: gradlew test
+
+  - stage: Publish_Results
+    jobs:
+      - job: Job_PublishResults
+        steps:
+          - bash: |
+              echo Publishing Results...
+            displayName: Publish Results
