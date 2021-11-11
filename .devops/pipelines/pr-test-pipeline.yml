@@ -1,7 +1,10 @@
 trigger:
   - none
 pr:
-  - development
+  branches:
+    exclude:
+      - development
+      - main
 
 pool:
   vmImage: 'macOS-10.14'
