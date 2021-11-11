@@ -19,7 +19,7 @@ stages:
             tasks: 'test'
           displayName: gradlew test
 
-  - stage: Publish Results
+  - stage: Publish_Results
     jobs:
       - job: Job_PublishResults
         steps:
