@@ -1,6 +1,8 @@
 pool:
   vmImage: 'macOS-10.14'
 
+trigger: none
+
 stages:
   - stage: Test
     jobs:
