@@ -56,9 +56,6 @@ android {
             events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
         }
     }
-    jacoco {
-        version "0.7.1.201405082137"
-    }
 }
 
 /*
