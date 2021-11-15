@@ -2,8 +2,10 @@ import os, sys
 from github import Github
 
 token = os.getenv('GITHUB_TOKEN')
+print("token " + token)
 github = Github(token)
 github_repo_slug = os.getenv('GITHUB_REPO_SLUG')
+print("github_repo_slug " + github_repo_slug)
 repo = github.get_repo(github_repo_slug)
     
 
