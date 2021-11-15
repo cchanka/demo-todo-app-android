@@ -22,6 +22,15 @@ steps:
     jdkArchitectureOption: 'x64'
     tasks: 'assembleDebug'
   displayName: gradlew assembleDebug
+  
+- task: AndroidSigning@3
+  inputs:
+    apkFiles: '**/*.apk'
+    apksignerKeystoreFile: 'testingks.jks'
+    apksignerKeystorePassword: '$(keystorepassword)'
+    apksignerKeystoreAlias: '$(keyalias)'
+    apksignerKeyPassword: '$(keypassword)'
+    zipalign: false
 
 - task: CopyFiles@2
   inputs:
