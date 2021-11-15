@@ -11,8 +11,10 @@ stages:
         steps:
         - bash: |
             pip3 install PyGithub
-            python3 .devops/devopsctl.py pr-comment update $(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER) "$(SYSTEM_PIPELINESTARTTIME): Testing..."
+            python3 .devops/devopsctl.py pr-comment update ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} "${SYSTEM_PIPELINESTARTTIME}: Testing..."
           displayName: printing all the enviornment variables
+        env:
+          GITHUB_TOKEN: $(GITHUB_TOKEN)
   #       - task: Gradle@2
   #         inputs:
   #           workingDirectory: ''
