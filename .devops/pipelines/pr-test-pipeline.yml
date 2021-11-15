@@ -10,7 +10,7 @@ stages:
       - job: Job_Test
         steps:
         - bash: |
-            printenv
+            python3 ../devopsctl.py pr-comment update $(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER) "$(SYSTEM_PIPELINESTARTTIME): Testing..."
           displayName: printing all the enviornment variables
   #       - task: Gradle@2
   #         inputs:
