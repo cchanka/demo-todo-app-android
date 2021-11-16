@@ -25,6 +25,7 @@ stages:
           inputs:
             codeCoverageTool: 'JaCoCo' 
             summaryFileLocation: $(System.DefaultWorkingDirectory)/app/build/jacoco/jacocoTestReport/jacocoTestReport.xml
+            reportDirectory: $(System.DefaultWorkingDirectory)/app/build/jacoco/jacocoTestReport/html
           displayName: Publish Test Coverage Report
 
         - bash: |
