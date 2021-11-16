@@ -28,20 +28,30 @@ stages:
             reportDirectory: $(System.DefaultWorkingDirectory)/app/build/jacoco/jacocoTestReport/html
           displayName: Publish Test Coverage Report
 
-        - bash: |
+        - task: Gradle@2
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.8'
+            jdkArchitectureOption: 'x64'
+            tasks: 'jacocoTestCoverageVerification'
+          env:
+            JACOCO_MIN_LIMIT: $(JACOCO_MIN_LIMIT)
+          displayName: Verify Test Coverage Min Limit
+        
+
+  - stage: Report_Results
+    jobs:
+      - job: Job_ReportResults
+        steps:
+          - bash: |
             echo Installing PyGithub...
             pip3 install PyGithub
 
             echo Reporting to Github...
-            python3 .devops/devopsctl.py pr-comment update ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} "${SYSTEM_PIPELINESTARTTIME}: Testing..."
+            python3 .devops/devopsctl.py pr-comment update ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} "CICD: ${SYSTEM_PIPELINESTARTTIME}: Testing complete!"
           displayName: Reporting to Github PR
           env:
             GITHUB_TOKEN: $(GITHUB_TOKEN)
-
-  - stage: Publish_Results
-    jobs:
-      - job: Job_PublishResults
-        steps:
-          - bash: |
-              echo Publishing Results...
-            displayName: Publish Results

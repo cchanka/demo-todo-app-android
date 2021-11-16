@@ -82,6 +82,24 @@ task jacocoTestReport(type: JacocoReport, dependsOn: "test") {
     }
 }
 
+task jacocoTestCoverageVerification(type: JacocoCoverageVerification, dependsOn: "jacocoTestReport") {
+    def jacocoTestCoverageMinLimit = System.getenv("JACOCO_MIN_LIMIT")
+    if(! jacocoTestCoverageMinLimit) jacocoTestCoverageMinLimit = "0.75"
+
+    violationRules {
+        rule {
+            limit {
+                minimum = new BigDecimal(jacocoTestCoverageMinLimit)
+            }
+        }
+        classDirectories = fileTree(
+                dir: "${buildDir}/intermediates/classes/test/mock/debug",
+                excludes: ['**/R*.class'])
+        sourceDirectories = files(coverageSourceDirs)
+        executionData = files("${buildDir}/jacoco/testMockDebugUnitTest.exec")
+    }
+}
+
 /*
  Dependency versions are defined in the top level build.gradle file. This helps keeping track of
  all versions in a single place. This improves readability and helps managing project complexity.
