@@ -53,7 +53,7 @@ stages:
             pip3 install PyGithub
 
             echo Reporting to Github...
-            python3 .devops/devopsctl.py pr-comment update ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} "CICD: SUCCESS - ${SYSTEM_PIPELINESTARTTIME} - Testing complete!"
+            python3 .devops/devopsctl.py pr-comment update ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} "CICD: SUCCESS - ${SYSTEM_PIPELINESTARTTIME} - ${SYSTEM_PULLREQUEST_SOURCECOMMITID} - Testing complete!"
           env:
             GITHUB_TOKEN: $(GITHUB_TOKEN)
           displayName: Reporting to Github PR
@@ -69,7 +69,7 @@ stages:
             pip3 install PyGithub
 
             echo Reporting to Github...
-            python3 .devops/devopsctl.py pr-comment update ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} "CICD: ERROR - ${SYSTEM_PIPELINESTARTTIME} - Testing failed!"
+            python3 .devops/devopsctl.py pr-comment update ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} "CICD: ERROR - ${SYSTEM_PIPELINESTARTTIME} - ${SYSTEM_PULLREQUEST_SOURCECOMMITID} - Testing failed!"
           env:
             GITHUB_TOKEN: $(GITHUB_TOKEN)
           displayName: Reporting to Github PR
