@@ -27,6 +27,16 @@ stages:
             summaryFileLocation: $(System.DefaultWorkingDirectory)/app/build/jacoco/jacocoTestReport/jacocoTestReport.xml
             reportDirectory: $(System.DefaultWorkingDirectory)/app/build/jacoco/jacocoTestReport/html
           displayName: Publish Test Coverage Report
+        
+        - bash: |
+            echo Installing Python requirements...
+            pip3 install -q -r .devops/requirements.txt
+
+            echo Reporting to Github PR...
+            python3 .devops/devopsctl.py github-pr-comment-jacoco-summary post ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} $(System.DefaultWorkingDirectory)/app/build/jacoco/jacocoTestReport/jacocoTestReport.xml
+          env:
+            GITHUB_TOKEN: $(GITHUB_TOKEN)
+          displayName: Reporting to Github PR
 
         - task: Gradle@2
           inputs:
@@ -48,7 +58,7 @@ stages:
       - job: Job_ReportResults
         steps:
         - bash: |
-            echo Installing requirements...
+            echo Installing Python requirements...
             pip3 install -q -r .devops/requirements.txt
 
             echo Reporting to Slack...
