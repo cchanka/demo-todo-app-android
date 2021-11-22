@@ -41,23 +41,6 @@ stages:
             JACOCO_MIN_LIMIT: $(JACOCO_MIN_LIMIT)
           displayName: Verify Test Coverage Min Limit
         
-
-  - stage: Report_Results_Success
-    condition: succeeded()
-    dependsOn: Test
-    jobs:
-      - job: Job_ReportResults
-        steps:
-        - bash: |
-            echo Installing PyGithub...
-            pip3 install PyGithub
-
-            echo Reporting to Github...
-            python3 .devops/devopsctl.py pr-comment update ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} "CICD: SUCCESS - ${SYSTEM_PIPELINESTARTTIME} - ${SYSTEM_PULLREQUEST_SOURCECOMMITID} - Testing complete!"
-          env:
-            GITHUB_TOKEN: $(GITHUB_TOKEN)
-          displayName: Reporting to Github PR
-  
   - stage: Report_Results_Failed
     condition: failed()
     dependsOn: Test
@@ -65,11 +48,11 @@ stages:
       - job: Job_ReportResults
         steps:
         - bash: |
-            echo Installing PyGithub...
-            pip3 install PyGithub
+            echo Installing requirements...
+            pip3 install -q -r .devops/requirements.txt
 
-            echo Reporting to Github...
-            python3 .devops/devopsctl.py pr-comment update ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} "CICD: ERROR - ${SYSTEM_PIPELINESTARTTIME} - ${SYSTEM_PULLREQUEST_SOURCECOMMITID} - [pipeline url](${SYSTEM_COLLECTIONURI}/${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}) - Testing failed!"
+            echo Reporting to Slack...
+            python3 .devops/devopsctl.py slack-msg post  "CICD: PR TEST FAILED - ${SYSTEM_PIPELINESTARTTIME} - ${SYSTEM_PULLREQUEST_SOURCECOMMITID} - [${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER}](${SYSTEM_COLLECTIONURI}/${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}) - PR Testing failed!"
           env:
             GITHUB_TOKEN: $(GITHUB_TOKEN)
-          displayName: Reporting to Github PR
+          displayName: Reporting to Slack
