@@ -35,6 +35,7 @@ stages:
             echo Reporting to Github PR...
             python3 .devops/devopsctl.py github-pr-comment-jacoco-summary post ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} $(System.DefaultWorkingDirectory)/app/build/jacoco/jacocoTestReport/jacocoTestReport.xml
           env:
+            GITHUB_REPO_SLUG: $(Build.Repository.Name)
             GITHUB_TOKEN: $(GITHUB_TOKEN)
           displayName: Reporting to Github PR
 
