@@ -20,11 +20,11 @@ pool:
      jdkVersionOption: '1.8'
      jdkArchitectureOption: 'x64'
      tasks: 'assembleDebug'
-    env:
-      MAJOR_VER: $(app_ver_major)
-      MINOR_VER: $(app_ver_minor)
-      PATCH_VER: $(app_ver_patch)
-      VERSION_CODE: $(BUILD_BUILDID)
+   env:
+     MAJOR_VER: $(app_ver_major)
+     MINOR_VER: $(app_ver_minor)
+     PATCH_VER: $(app_ver_patch)
+     VERSION_CODE: $(BUILD_BUILDID)
    displayName: gradlew assembleDebug
   
 # # - task: AndroidSigning@3
