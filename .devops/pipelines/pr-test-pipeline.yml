@@ -52,7 +52,5 @@ stages:
             pip3 install -q -r .devops/requirements.txt
 
             echo Reporting to Slack...
-            python3 .devops/devopsctl.py slack-msg post  "CICD: PR TEST FAILED - ${SYSTEM_PIPELINESTARTTIME} - ${SYSTEM_PULLREQUEST_SOURCECOMMITID} - [${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER}](${SYSTEM_COLLECTIONURI}/${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}) - PR Testing failed!"
-          env:
-            GITHUB_TOKEN: $(GITHUB_TOKEN)
+            python3 .devops/devopsctl.py slack-msg post  "CICD: PR TEST FAILED - ${SYSTEM_PIPELINESTARTTIME} - <${BUILD_REPOSITORY_URI}/pull/${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER}|PR> - <${SYSTEM_COLLECTIONURI}/${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}|Pipeline> - PR Testing failed!"
           displayName: Reporting to Slack
