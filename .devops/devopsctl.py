@@ -22,7 +22,7 @@ def github_pr_comment_post(pr_id, pr_comment):
     issue = github_repo.get_issue(int(pr_id))
     # Create a comment in the Github issue
     issue.create_comment(pr_comment)
-    print("PR comment updated.")
+    print("Posted to Github PR.")
     return
 
 # Posting Jacoco report summary as a PR Comment
