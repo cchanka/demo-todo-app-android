@@ -32,15 +32,26 @@ steps:
     apksignerKeyPassword: '$(keypassword)'
     zipalign: false
 
-- task: CopyFiles@2
+- task: AppCenterDistribute@3
   inputs:
-    contents: '**/*.apk'
-    targetFolder: '$(build.artifactStagingDirectory)'
-  displayName: Copy .apk files to artifact staging directory
+    serverEndpoint: 'TODOAPP-APP-CENTER'
+    appSlug: 'cchanka/TODOAPP-CHANKA'
+    appFile: '$(System.DefaultWorkingDirectory)/app/build/outputs/apk/app-prod-debug.apk'
+    symbolsOption: 'Android'
+    releaseNotesOption: 'input'
+    releaseNotesInput: 'DEV Release from Azure DevOps'
+    destinationType: 'groups'
+    distributionGroupId: 'fa5af56c-dfed-4298-820d-0ac72bffbd20'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathToPublish: '$(build.artifactStagingDirectory)'
-    artifactName: 'drop'
-    artifactType: 'container'
-  displayName: Publish artifacts
+# - task: CopyFiles@2
+#   inputs:
+#     contents: '**/*.apk'
+#     targetFolder: '$(build.artifactStagingDirectory)'
+#   displayName: Copy .apk files to artifact staging directory
+
+# - task: PublishBuildArtifacts@1
+#   inputs:
+#     pathToPublish: '$(build.artifactStagingDirectory)'
+#     artifactName: 'drop'
+#     artifactType: 'container'
+#   displayName: Publish artifacts
