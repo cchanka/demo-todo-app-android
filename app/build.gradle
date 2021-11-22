@@ -1,6 +1,20 @@
 apply plugin: 'com.android.application'
 apply plugin: 'jacoco'
 
+def getVersionCode = { ->
+    def code = System.getenv("VERSION_CODE") ? versionCode.toInteger() : -1
+    println "VersionCode is set to $code"
+    return code
+}
+
+def getVersionName = { ->
+    def major = System.getenv("MAJOR_VER") ? versionName : "1"
+    def minor = System.getenv("MINOR_VER") ? versionName : "0"
+    def patch = System.getenv("PATCH_VER") ? versionName : "0"
+    println "VersionName is set to ${major}.${minor}.${patch}"
+    return "${major}.${minor}.${patch}"
+}
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -9,8 +23,8 @@ android {
         applicationId "com.example.android.architecture.blueprints.todomvp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode getVersionCode()
+        versionName getVersionName()
 
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
