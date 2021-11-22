@@ -23,25 +23,25 @@ steps:
     tasks: 'assembleDebug'
   displayName: gradlew assembleDebug
   
-- task: AndroidSigning@3
-  inputs:
-    apkFiles: '**/*.apk'
-    apksignerKeystoreFile: 'testingks.jks'
-    apksignerKeystorePassword: '$(keystorepassword)'
-    apksignerKeystoreAlias: '$(keyalias)'
-    apksignerKeyPassword: '$(keypassword)'
-    zipalign: false
+# - task: AndroidSigning@3
+#   inputs:
+#     apkFiles: '**/*.apk'
+#     apksignerKeystoreFile: '$(keystorefilename)'
+#     apksignerKeystorePassword: '$(keystorepassword)'
+#     apksignerKeystoreAlias: '$(keyalias)'
+#     apksignerKeyPassword: '$(keypassword)'
+#     zipalign: false
 
 - task: AppCenterDistribute@3
   inputs:
-    serverEndpoint: 'TODOAPP-APP-CENTER'
-    appSlug: 'cchanka/TODOAPP-CHANKA'
+    serverEndpoint: '$(APPCENTER_SC_NAME)'
+    appSlug: '$(APPCENTER_APP_SLUG)'
     appFile: '$(System.DefaultWorkingDirectory)/app/build/outputs/apk/app-prod-debug.apk'
     symbolsOption: 'Android'
     releaseNotesOption: 'input'
-    releaseNotesInput: 'DEV Release from Azure DevOps'
+    releaseNotesInput: '$(APPCENTER_APP_REL_NOTES)'
     destinationType: 'groups'
-    distributionGroupId: 'fa5af56c-dfed-4298-820d-0ac72bffbd20'
+    distributionGroupId: '$(APPCENTER_DIST_GROUP_IDS)'
 
 # - task: CopyFiles@2
 #   inputs:
