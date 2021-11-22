@@ -27,15 +27,6 @@ steps:
      PATCH_VER: $(app_ver_patch)
      VERSION_CODE: $(Build.BuildId)
    displayName: gradlew assembleDebug
-  
-# # - task: AndroidSigning@3
-# #   inputs:
-# #     apkFiles: '**/*.apk'
-# #     apksignerKeystoreFile: '$(keystorefilename)'
-# #     apksignerKeystorePassword: '$(keystorepassword)'
-# #     apksignerKeystoreAlias: '$(keyalias)'
-# #     apksignerKeyPassword: '$(keypassword)'
-# #     zipalign: false
 
  - task: AppCenterDistribute@3
    inputs:
@@ -47,16 +38,3 @@ steps:
      releaseNotesInput: '$(APPCENTER_APP_REL_NOTES)'
      destinationType: 'groups'
      distributionGroupId: '$(APPCENTER_DIST_GROUP_IDS)'
-
-# # - task: CopyFiles@2
-# #   inputs:
-# #     contents: '**/*.apk'
-# #     targetFolder: '$(build.artifactStagingDirectory)'
-# #   displayName: Copy .apk files to artifact staging directory
-
-# # - task: PublishBuildArtifacts@1
-# #   inputs:
-# #     pathToPublish: '$(build.artifactStagingDirectory)'
-# #     artifactName: 'drop'
-# #     artifactType: 'container'
-# #   displayName: Publish artifacts
