@@ -2,15 +2,15 @@ apply plugin: 'com.android.application'
 apply plugin: 'jacoco'
 
 def getVersionCode = {
-    def code = System.getenv("VERSION_CODE") ? versionCode.toInteger() : -1
+    def code = System.getenv("VERSION_CODE") ? System.getenv("VERSION_CODE").toInteger() : -1
     println "VersionCode is set to $code"
     return code
 }
 
 def getVersionName = {
-    def major = System.getenv("MAJOR_VER") ? versionName : "1"
-    def minor = System.getenv("MINOR_VER") ? versionName : "0"
-    def patch = System.getenv("PATCH_VER") ? versionName : "0"
+    def major = System.getenv("MAJOR_VER") ? System.getenv("MAJOR_VER") : "1"
+    def minor = System.getenv("MINOR_VER") ? System.getenv("MINOR_VER") : "0"
+    def patch = System.getenv("PATCH_VER") ? System.getenv("PATCH_VER") : "0"
     println "VersionName is set to ${major}.${minor}.${patch}"
     return "${major}.${minor}.${patch}"
 }
