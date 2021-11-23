@@ -11,3 +11,5 @@ resources:
 
 jobs:
 - template: pr-test-pipeline-template.yml@templates
+  parameters:
+    yesNo: True
