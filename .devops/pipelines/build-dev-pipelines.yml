@@ -8,9 +8,6 @@ trigger:
 
 pr: none
 
-pool:
-  vmImage: 'macOS-10.14'
-
 resources:
   repositories:
   - repository: templates
@@ -21,3 +18,13 @@ resources:
 
 stages:
 - template: build-dev-pipeline-template.yml@templates
+  parameters:
+    appVersionMajor: $(app_ver_major)
+    appVersionMinor: $(app_ver_minor)
+    appVersionPatch: $(app_ver_patch)
+    appVersionCode: $(Build.BuildId)
+    appFilePath: $(System.DefaultWorkingDirectory)/app/build/outputs/apk/app-prod-debug.apk
+    appCenterServiceConnection: $(APPCENTER_SC_NAME)
+    appCenterAppSlug: $(APPCENTER_APP_SLUG)
+    appCenterDistributionGroupIDs: $(APPCENTER_DIST_GROUP_IDS)
+    vmImage: macOS-10.14
