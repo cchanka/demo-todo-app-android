@@ -85,7 +85,7 @@ def slack_msg_post_failed_tests(pr_id, test_result_directory):
     for test in junitTestResults.keys():
         slack_msg+="Test - *%s*\n" % test
         slack_msg+="Classname - *%s*\n" % junitTestResults[test]['classname']
-        slack_msg+="Error Msg :\n```%s```" % junitTestResults[test]['message']
+        slack_msg+="Error Msg :\n```%s```\n\n" % junitTestResults[test]['message']
 
     payload = '{"text":"%s"}' % slack_msg
     # Post data to Slack channel
