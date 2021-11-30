@@ -122,12 +122,12 @@ def junit_xml_dir_parse(reportDirPath):
             suite = JUnitXml.fromfile(os.path.join(reportDirPath, filename))
             for case in suite:
                 print(case)
-                if case.result:
-                    print(case.result)
-                    if isinstance(case.result, Failure):
+                if case.result[0]:
+                    print(case.result[0])
+                    if isinstance(case.result[0], Failure):
                         testCase={}
                         testCase['classname']=case.classname
-                        testCase['message']=case.result.message
+                        testCase['message']=case.result[0].message
                         testCase['status']="FAILED"
                         failedTests[case.name]=testCase
     
