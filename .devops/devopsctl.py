@@ -1,5 +1,6 @@
 import os, sys, requests
 import xml.etree.ElementTree as ET
+from junitparser import JUnitXml, Failure
 from github import Github
 
 ######## GITHUB ########
@@ -76,6 +77,22 @@ def slack_msg_post(slack_message):
     print(response.text)
     return
 
+def slack_msg_post_failed_tests(pr_id, test_result_directory):
+    init_slack()
+
+    slack_msg="*PR ID: %s - Tests Failed *\n" % pr_id
+    junitTestResults=junit_xml_dir_parse(test_result_directory)
+    for test in junitTestResults.keys():
+        slack_msg+="Test - *%s*\n" % test
+        slack_msg+="Classname - *%s*\n" % junitTestResults[test]['classname']
+        slack_msg+="Error Msg :\n```%s```" % junitTestResults[test]['message']
+
+    payload = '{"text":"%s"}' % slack_msg
+    # Post data to Slack channel
+    response = requests.post(slack_webhook_url, data=payload)
+    print("Posted to Slack.")
+    return
+
 ######## JACOCO ########
 # Parse Jacoco XML report
 def jacoco_xml_summary_parse(reportPath):
@@ -90,6 +107,28 @@ def jacoco_xml_summary_parse(reportPath):
             "missed": child.attrib["missed"], "covered": child.attrib["covered"]}
     
     return summary
+
+######## JUnit ########
+# Parse JUnit XML report
+def junit_xml_dir_parse(reportDirPath):
+    # Parse xml
+    failedTests = {}
+    directory = os.fsencode(reportDirPath)
+    
+    for file in os.listdir(directory):
+        filename = os.fsdecode(file)
+        if filename.endswith(".xml"): 
+            suite = JUnitXml.fromfile(os.path.join(reportDirPath, filename))
+            for case in suite:
+                if case.result:
+                    if isinstance(case.result, Failure):
+                        testCase={}
+                        testCase['classname']=case.classname
+                        testCase['message']=case.result.message
+                        testCase['status']="FAILED"
+                        failedTests[case.name]=testCase
+    
+    return failedTests
 
 ######## main ########
 def main():
@@ -109,6 +148,10 @@ def main():
     if resource == "slack-msg":
         if action == "post":
             slack_msg_post(slack_message=payload[0])
+
+    if resource == "slack-msg-failed-tests":
+        if action == "post":
+            slack_msg_post_failed_tests(pr_id=payload[0], test_result_directory=payload[1])
 
 
 if __name__ == "__main__":
