@@ -12,3 +12,10 @@ resources:
 
 stages:
 - template: pr-test-pipeline-template.yml@templates
+  parameters:
+    prNumber: $(System.PullRequest.PullRequestNumber}
+    jacocoTestCoverageMinLimit: $(JACOCO_MIN_LIMIT)
+    githubToken: $(GITHUB_TOKEN)
+    githubRepoSlug: $(Build.Repository.Name)
+    slackWebhookURL: $(SLACK_WEBHOOK_URL)
+    vmImage: macOS-10.14
