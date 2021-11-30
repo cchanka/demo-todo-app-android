@@ -82,6 +82,7 @@ def slack_msg_post_failed_tests(pr_id, test_result_directory):
 
     slack_msg="*PR ID: %s - Tests Failed *\n" % pr_id
     junitTestResults=junit_xml_dir_parse(test_result_directory)
+    print("--", junitTestResults)
     for test in junitTestResults.keys():
         slack_msg+="Test - *%s*\n" % test
         slack_msg+="Classname - *%s*\n" % junitTestResults[test]['classname']
