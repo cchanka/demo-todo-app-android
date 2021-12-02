@@ -1,4 +1,5 @@
 import os, sys, requests
+import unittest
 import xml.etree.ElementTree as ET
 from junitparser import JUnitXml, Failure
 from github import Github
@@ -97,11 +98,14 @@ def get_kpi_build_time_average():
     return
 
 # Get pipeline runs count last month
-def get_kpi_pipeline_runs_count():
+def get_kpi_pipeline_runs_count(buildDef):
+    if not isinstance(buildDef, int):
+        raise TypeError("The Build Definition can only be int")
+    
     pat = os.getenv('PAT')
     organization = os.getenv('AZDO_ORG')
     project = os.getenv('AZDO_PROJ')
-    buildDefinition = os.getenv('BUILD_DEF')
+    buildDefinition = buildDef
     lastMonthDate = date.today() - timedelta(days=30)
     # buildMetricsEndpoint = "https://:{pat}@dev.azure.com/{org}/{proj}/_apis/build/definitions/{buildDef}/metrics/daily?minMetricsTime={minTime}&api-version=6.0-preview.1".format(
     buildMetricsEndpoint = "https://:{pat}@dev.azure.com/{org}/{proj}/_apis/build/builds?definitions={buildDef}&minTime={minTime}&api-version=6.0".format(
@@ -256,7 +260,7 @@ def main():
     
     if resource == "kpi-pipeline-runs-count-last-month":
         if action == "get":
-            get_kpi_pipeline_runs_count()
+            get_kpi_pipeline_runs_count(buildDef=int(payload[0]))
 
 
 if __name__ == "__main__":
