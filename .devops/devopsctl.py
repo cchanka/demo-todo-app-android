@@ -2,6 +2,9 @@ import os, sys, requests
 import xml.etree.ElementTree as ET
 from junitparser import JUnitXml, Failure
 from github import Github
+from datetime import timedelta, date
+import pandas as pd
+
 
 ######## GITHUB ########
 # Initialize Github
@@ -24,6 +27,93 @@ def github_pr_comment_post(pr_id, pr_comment):
     # Create a comment in the Github issue
     issue.create_comment(pr_comment)
     print("Posted to Github PR.")
+    return
+
+# Get test cases count
+def get_kpi_test_cases():
+    pat = os.getenv('PAT')
+    organization = os.getenv('AZDO_ORG')
+    project = os.getenv('AZDO_PROJ')
+    buildUri = os.getenv('BUILD_URI')
+    # testQueryEndpoint = "https://:{0}@dev.azure.com/{1}/{2}/_apis/test/runs?minLastUpdatedDate=2021-11-10&maxLastUpdatedDate=2021-11-12&buildIds={3}&api-version=6.0".format(
+            # pat,
+            # organization,
+            # project,
+            # build_id)
+    testRunListEndpoint = "https://:{pat}@dev.azure.com/{org}/{proj}/_apis/test/runs?buildUri={buildUri}&api-version=6.0".format(
+            pat=pat,
+            org=organization,
+            proj=project,
+            buildUri=buildUri)
+    testRunListResponse = requests.get(url=testRunListEndpoint)
+    testRunId = testRunListResponse.json()['value'][0]['id']
+
+    testRunByIdEndpoint = "https://:{pat}@dev.azure.com/{org}/{proj}/_apis/test/runs/{testRun}".format(
+            pat=pat,
+            org=organization,
+            proj=project,
+            testRun=testRunId)
+
+    testRunByIdResponse = requests.get(url=testRunByIdEndpoint)
+    totalTests = testRunByIdResponse.json()['totalTests']
+    incompleteTests = testRunByIdResponse.json()['incompleteTests']
+    notApplicableTests = testRunByIdResponse.json()['notApplicableTests']
+    passedTests = testRunByIdResponse.json()['passedTests']
+    unanalyzedTests = testRunByIdResponse.json()['unanalyzedTests']
+
+    print("Total Tests : {0}".format(totalTests))
+    print("Incomplete Tests : {0}".format(incompleteTests))
+    print("N/A Tests : {0}".format(notApplicableTests))
+    print("Passed Tests : {0}".format(passedTests))
+    print("Unanalyzed Tests : {0}".format(unanalyzedTests))
+    return
+
+# Get average build time last month
+def get_kpi_build_time_average():
+    pat = os.getenv('PAT')
+    organization = os.getenv('AZDO_ORG')
+    project = os.getenv('AZDO_PROJ')
+    buildDefinition = os.getenv('BUILD_DEF')
+    lastMonthDate = date.today() - timedelta(days=30)
+    testRunListEndpoint = "https://:{pat}@dev.azure.com/{org}/{proj}/_apis/build/builds?definitions={buildDef}&minTime={minTime}&api-version=6.0".format(
+            pat=pat,
+            org=organization,
+            proj=project,
+            buildDef=buildDefinition,
+            minTime=lastMonthDate)
+    testRunListResponse = requests.get(url=testRunListEndpoint)
+    totalBuildTimeInSec=0.0
+    builds=testRunListResponse.json()['value']
+    buildCount=len(builds)
+    for build in builds:
+        startTime = pd.to_datetime(build['startTime'], format='%Y-%m-%dT%H:%M:%S.%fZ')
+        finishTime = pd.to_datetime(build['finishTime'], format='%Y-%m-%dT%H:%M:%S.%fZ')
+        timeTaken = finishTime - startTime
+        totalBuildTimeInSec += timeTaken.total_seconds()
+    
+    averageBuildTimeInSec = totalBuildTimeInSec / buildCount
+    print("Average Build Time (last 30 days):", timedelta(seconds=averageBuildTimeInSec))
+
+    return
+
+# Get pipeline runs count last month
+def get_kpi_pipeline_runs_count():
+    pat = os.getenv('PAT')
+    organization = os.getenv('AZDO_ORG')
+    project = os.getenv('AZDO_PROJ')
+    buildDefinition = os.getenv('BUILD_DEF')
+    lastMonthDate = date.today() - timedelta(days=30)
+    # buildMetricsEndpoint = "https://:{pat}@dev.azure.com/{org}/{proj}/_apis/build/definitions/{buildDef}/metrics/daily?minMetricsTime={minTime}&api-version=6.0-preview.1".format(
+    buildMetricsEndpoint = "https://:{pat}@dev.azure.com/{org}/{proj}/_apis/build/builds?definitions={buildDef}&minTime={minTime}&api-version=6.0".format(
+            pat=pat,
+            org=organization,
+            proj=project,
+            buildDef=buildDefinition,
+            minTime=lastMonthDate)
+    buildMetricsResponse = requests.get(url=buildMetricsEndpoint)
+
+    print("Total Pipeline Runs Last Month:", buildMetricsResponse.json()['count'])
+
     return
 
 # Posting Jacoco report summary as a PR Comment
@@ -121,13 +211,13 @@ def junit_xml_dir_parse(reportDirPath):
         if filename.endswith(".xml"): 
             suite = JUnitXml.fromfile(os.path.join(reportDirPath, filename))
             for case in suite:
-                print(case)
-                if case.result[0]:
-                    print(case.result[0])
-                    if isinstance(case.result[0], Failure):
+                # print(case)
+                if case.result:
+                    # print(case.result[0])
+                    if isinstance(case.result, Failure):
                         testCase={}
                         testCase['classname']=case.classname
-                        testCase['message']=case.result[0].message
+                        testCase['message']=case.result.message
                         testCase['status']="FAILED"
                         failedTests[case.name]=testCase
     
@@ -155,6 +245,18 @@ def main():
     if resource == "slack-msg-failed-tests":
         if action == "post":
             slack_msg_post_failed_tests(pr_id=payload[0], test_result_directory=payload[1])
+
+    if resource == "kpi-test-cases":
+        if action == "get":
+            get_kpi_test_cases()
+    
+    if resource == "kpi-build-time-average":
+        if action == "get":
+            get_kpi_build_time_average()
+    
+    if resource == "kpi-pipeline-runs-count-last-month":
+        if action == "get":
+            get_kpi_pipeline_runs_count()
 
 
 if __name__ == "__main__":
