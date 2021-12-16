@@ -1,7 +1,7 @@
 name: Build Android App
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Assemble-Android-App:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -10,11 +10,9 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 11
-      - run: |
-          pwd
-          ls -al
-          tree
+      - name: Set EXE permission for gradlew
+        run: |
           chmod +x gradlew
       - uses: gradle/gradle-build-action@v2
         with:
-          arguments: build
+          arguments: assembleDebug
