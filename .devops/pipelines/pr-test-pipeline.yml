@@ -3,65 +3,19 @@ pool:
 
 trigger: none
 
+resources:
+  repositories:
+  - repository: templates
+    type: github
+    name: cchanka/azdo-pipeline-templates
+    endpoint: GitHub connection - cchanka
+
 stages:
-  - stage: Test
-    jobs:
-      - job: Job_Test
-        steps:
-        - task: Gradle@2
-          inputs:
-            workingDirectory: ''
-            gradleWrapperFile: 'gradlew'
-            gradleOptions: '-Xmx3072m'
-            javaHomeOption: 'JDKVersion'
-            jdkVersionOption: '1.8'
-            jdkArchitectureOption: 'x64'
-            publishJUnitResults: true
-            testResultsFiles: '**/TEST-*.xml'
-            tasks: 'test jacocoTestReport'
-          displayName: Run Unit Test and Generate Coverage Report
-
-        - task: PublishCodeCoverageResults@1
-          inputs:
-            codeCoverageTool: 'JaCoCo' 
-            summaryFileLocation: $(System.DefaultWorkingDirectory)/app/build/jacoco/jacocoTestReport/jacocoTestReport.xml
-            reportDirectory: $(System.DefaultWorkingDirectory)/app/build/jacoco/jacocoTestReport/html
-          displayName: Publish Test Coverage Report
-        
-        - bash: |
-            echo Installing Python requirements...
-            pip3 install -q -r .devops/requirements.txt
-
-            echo Reporting to Github PR...
-            python3 .devops/devopsctl.py github-pr-comment-jacoco-summary post ${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER} $(System.DefaultWorkingDirectory)/app/build/jacoco/jacocoTestReport/jacocoTestReport.xml
-          env:
-            GITHUB_REPO_SLUG: $(Build.Repository.Name)
-            GITHUB_TOKEN: $(GITHUB_TOKEN)
-          displayName: Reporting to Github PR
-
-        - task: Gradle@2
-          inputs:
-            workingDirectory: ''
-            gradleWrapperFile: 'gradlew'
-            gradleOptions: '-Xmx3072m'
-            javaHomeOption: 'JDKVersion'
-            jdkVersionOption: '1.8'
-            jdkArchitectureOption: 'x64'
-            tasks: 'jacocoTestCoverageVerification'
-          env:
-            JACOCO_MIN_LIMIT: $(JACOCO_MIN_LIMIT)
-          displayName: Verify Test Coverage Min Limit
-        
-  - stage: Report_Results_Failed
-    condition: failed()
-    dependsOn: Test
-    jobs:
-      - job: Job_ReportResults
-        steps:
-        - bash: |
-            echo Installing Python requirements...
-            pip3 install -q -r .devops/requirements.txt
-
-            echo Reporting to Slack...
-            python3 .devops/devopsctl.py slack-msg post  "CICD: PR TEST FAILED - ${SYSTEM_PIPELINESTARTTIME} - <${BUILD_REPOSITORY_URI}/pull/${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER}|PR> - <${SYSTEM_COLLECTIONURI}/${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}|Pipeline> - PR Testing failed!"
-          displayName: Reporting to Slack
+- template: pr-test-pipeline-template.yml@templates
+  parameters:
+    prNumber: $(System.PullRequest.PullRequestNumber)
+    jacocoTestCoverageMinLimit: $(JACOCO_MIN_LIMIT)
+    githubToken: $(GITHUB_TOKEN)
+    githubRepoSlug: $(Build.Repository.Name)
+    slackWebhookURL: $(SLACK_WEBHOOK_URL)
+    vmImage: macOS-10.14

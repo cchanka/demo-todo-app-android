@@ -8,33 +8,23 @@ trigger:
 
 pr: none
 
-pool:
-  vmImage: 'macOS-10.14'
+resources:
+  repositories:
+  - repository: templates
+    type: github
+    name: cchanka/azdo-pipeline-templates
+    endpoint: GitHub connection - cchanka
 
-steps:
- - task: Gradle@2
-   inputs:
-     workingDirectory: ''
-     gradleWrapperFile: 'gradlew'
-     gradleOptions: '-Xmx3072m'
-     javaHomeOption: 'JDKVersion'
-     jdkVersionOption: '1.8'
-     jdkArchitectureOption: 'x64'
-     tasks: 'assembleDebug'
-   env:
-     MAJOR_VER: $(app_ver_major)
-     MINOR_VER: $(app_ver_minor)
-     PATCH_VER: $(app_ver_patch)
-     VERSION_CODE: $(Build.BuildId)
-   displayName: gradlew assembleDebug
 
- - task: AppCenterDistribute@3
-   inputs:
-     serverEndpoint: '$(APPCENTER_SC_NAME)'
-     appSlug: '$(APPCENTER_APP_SLUG)'
-     appFile: '$(System.DefaultWorkingDirectory)/app/build/outputs/apk/app-prod-debug.apk'
-     symbolsOption: 'Android'
-     releaseNotesOption: 'input'
-     releaseNotesInput: '$(APPCENTER_APP_REL_NOTES)'
-     destinationType: 'groups'
-     distributionGroupId: '$(APPCENTER_DIST_GROUP_IDS)'
+stages:
+- template: build-dev-pipeline-template.yml@templates
+  parameters:
+    appVersionMajor: $(app_ver_major)
+    appVersionMinor: $(app_ver_minor)
+    appVersionPatch: $(app_ver_patch)
+    appVersionCode: $(Build.BuildId)
+    appFilePath: $(System.DefaultWorkingDirectory)/app/build/outputs/apk/app-prod-debug.apk
+    appCenterServiceConnection: $(APPCENTER_SC_NAME)
+    appCenterAppSlug: $(APPCENTER_APP_SLUG)
+    appCenterDistributionGroupIDs: $(APPCENTER_DIST_GROUP_IDS)
+    vmImage: macOS-10.14

@@ -104,7 +104,7 @@ public class TaskDetailPresenterTest {
         inOrder.verify(mTaskDetailView).setLoadingIndicator(false);
         verify(mTaskDetailView).showTitle(TITLE_TEST);
         verify(mTaskDetailView).showDescription(DESCRIPTION_TEST);
-        verify(mTaskDetailView).showCompletionStatus(false);
+        verify(mTaskDetailView).showCompletionStatus(true);
     }
 
     @Test
