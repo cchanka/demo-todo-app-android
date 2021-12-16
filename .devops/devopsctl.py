@@ -92,10 +92,22 @@ def get_kpi_build_time_average():
         timeTaken = finishTime - startTime
         totalBuildTimeInSec += timeTaken.total_seconds()
     
-    averageBuildTimeInSec = totalBuildTimeInSec / buildCount
+    # startDate = dateutil.parser.parse(data.get('startTime'))
+    # endDate = dateutil.parser.parse(data.get('finishTime'))
+    
+    averageBuildTimeInSec = get_average(totalBuildTimeInSec, buildCount)
     print("Average Build Time (last 30 days):", timedelta(seconds=averageBuildTimeInSec))
 
     return
+
+def get_average(total, count):
+    if not isinstance(count,int) and not isinstance(total,int):
+        raise TypeError("count and total can only be int")
+    
+    if count <= 0:
+        raise ValueError("count can only be a positive integer")
+
+    return total / count
 
 # Get pipeline runs count last month
 def get_kpi_pipeline_runs_count(buildDef):
@@ -108,7 +120,7 @@ def get_kpi_pipeline_runs_count(buildDef):
     buildDefinition = buildDef
     lastMonthDate = date.today() - timedelta(days=30)
     # buildMetricsEndpoint = "https://:{pat}@dev.azure.com/{org}/{proj}/_apis/build/definitions/{buildDef}/metrics/daily?minMetricsTime={minTime}&api-version=6.0-preview.1".format(
-    buildMetricsEndpoint = "https://:{pat}@dev.azure.com/{org}/{proj}/_apis/build/builds?definitions={buildDef}&minTime={minTime}&api-version=6.0".format(
+    buildMetricsEndpoint = "https://:{pat}@dev.azure.com/{org}/{proj}/_apis/build/builds?definitions={buildDef}&minTime={minTime}&statusFilter=completed&resultFilter=succeeded&api-version=6.0".format(
             pat=pat,
             org=organization,
             proj=project,
