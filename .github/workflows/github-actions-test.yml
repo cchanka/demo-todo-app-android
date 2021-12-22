@@ -1,15 +1,24 @@
 name: Build Android App
-on: [push]
+on: 
+  workflow_dispatch:
+  
 jobs:
-  Explore-GitHub-Actions:
+  Assemble-Android-App:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+
       - uses: actions/setup-java@v1
         with:
           java-version: 11
+
+      - name: Set EXE permission for gradlew
+        run: |
+          chmod +x gradlew
+          
       - uses: gradle/gradle-build-action@v2
         with:
-          arguments: build
+          arguments: assembleDebug
